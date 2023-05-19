@@ -39,18 +39,6 @@ jobs:
         password: ${{ secrets.DOCKER_PASSWORD }}
         logout: true
         
-    - name: Build and export to Docker
-      uses: docker/build-push-action@v4
-      with:
-        context: .
-        file: Api/Dockerfile
-        load: true
-        tags: ${{ format('{0}:{1}', env.IMAGE_NAME, env.TEST_TAG) }}
-        
-    - name: Test
-      run: |
-        docker run --rm ${{ format('{0}:{1}', env.IMAGE_NAME, env.TEST_TAG) }}
-        
     - name: Build and push Docker image
       uses: docker/build-push-action@v4
       with:
