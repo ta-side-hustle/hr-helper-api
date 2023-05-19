@@ -2,6 +2,10 @@
 
 services:
   api:
+    build:
+      context: .
+      dockerfile: Api/Dockerfile
+      target: final
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - USER_SECRETS_ID=a25ed8ff-e45e-4e09-9596-1037e0963527

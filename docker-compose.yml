@@ -18,15 +18,13 @@ secrets:
 
 services:
   api:
-    image: api
-    build:
-      context: .
-      dockerfile: Api/Dockerfile
+    image: tinymosi/hr-helper-api:latest
     ports:
       - "5000:80"
       - "5001:443"
     environment:
-      - ASPNETCORE_ENVIRONMENT=Production
+      TZ: "Asia/Yekaterinburg"
+      ASPNETCORE_ENVIRONMENT: Production
     secrets:
       - ConnectionStringsOptions__DefaultConnection
       - JwtOptions__Audience
