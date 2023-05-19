@@ -6,9 +6,14 @@ on:
   pull_request:
     branches: [ "master" ]
 
+env:
+  IMAGE_NAME: tinymosi/hr-helper-api
+  TEST_TAG: test
+  LATEST_TAG: latest
+  
 jobs:
-  build_and_push_docker_image:
-    name: Build and push Docker image to Docker Hub
+  docker:
+    name: Build, test and push Docker image to Docker Hub
     runs-on: ubuntu-latest
     steps:
     - name: Checkout the repo
@@ -20,6 +25,12 @@ jobs:
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         tag_prefix: ''
+        
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v2
+      
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
       
     - name: Log in to Docker hub
       uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
@@ -28,12 +39,28 @@ jobs:
         password: ${{ secrets.DOCKER_PASSWORD }}
         logout: true
         
-    - name: Build and push Docker image
-      uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
+    - name: Build and export to Docker
+      uses: docker/build-push-action@v4
       with:
         context: .
         file: Api/Dockerfile
+        load: true
+        tags: ${{ format('{0}:{1}', env.IMAGE_NAME, env.TEST_TAG) }}
+        
+    - name: Test
+      run: |
+        docker run --rm ${{ format('{0}:{1}', env.IMAGE_NAME, env.TEST_TAG) }}
+        
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v4
+      with:
+        context: .
+        file: Api/Dockerfile
+        platforms: |
+          linux/amd64
+          linux/arm/v7
+          linux/arm64/v8
         push: true
         tags: |
-          tinymosi/hr-helper-api:${{ steps.meta.outputs.new_tag }}
-          tinymosi/hr-helper-api:latest
+          ${{ format('{0}:{1}', env.IMAGE_NAME, steps.meta.outputs.new_tag) }}
+          ${{ format('{0}:{1}', env.IMAGE_NAME, env.LATEST_TAG) }}
