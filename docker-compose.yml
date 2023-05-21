@@ -19,6 +19,7 @@ secrets:
 services:
   api:
     image: tinymosi/hr-helper-api:latest
+    pull_policy: always
     ports:
       - "5000:80"
       - "5001:443"
