@@ -3,7 +3,7 @@ WORKDIR /app
 EXPOSE 80
 EXPOSE 443
 
-FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
+FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:8.0-preview AS build
 WORKDIR /src
 COPY ["Api/Api.csproj", "Api/"]
 COPY ["Infrastructure/Infrastructure.csproj", "Infrastructure/"]
