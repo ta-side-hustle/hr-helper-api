@@ -114,9 +114,10 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
 	app.UseDeveloperExceptionPage();
-	app.UseSwagger();
-	app.UseSwaggerUI(uiOptions => { uiOptions.SwaggerEndpoint("/swagger/v1/swagger.json", "hr_helper_api v1"); });
 }
+
+app.UseSwagger();
+app.UseSwaggerUI(uiOptions => { uiOptions.SwaggerEndpoint("/swagger/v1/swagger.json", "hr_helper_api v1"); });
 
 app.ConfigureExceptionHandler();
 
