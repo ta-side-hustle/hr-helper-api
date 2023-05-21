@@ -13,7 +13,7 @@ env:
   
 jobs:
   docker:
-    name: Build, test and push Docker image to Docker Hub
+    name: Build and push Docker image to Docker Hub
     runs-on: ubuntu-latest
     steps:
     - name: Checkout the repo
@@ -52,3 +52,14 @@ jobs:
         tags: |
           ${{ format('{0}:{1}', env.IMAGE_NAME, steps.meta.outputs.new_tag) }}
           ${{ format('{0}:{1}', env.IMAGE_NAME, env.LATEST_TAG) }}
+
+  redeploy:
+    name: Redeploy webhook call
+    runs-on: ubuntu-latest
+    needs: [docker]
+    steps:
+      - name: Deploy docker container webhook
+        uses: joelwmale/webhook-action@448a17bf857ead98546cfbdbe3b9d4cf979dda95
+        with:
+          url: ${{ secrets.DEPLOY_URL }}
+          body: ${{ format('{{ "token":"{0}" }}', secrets.DEPLOY_TOKEN) }}
