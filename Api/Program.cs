@@ -17,7 +17,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Options injection
 if (builder.Environment.IsProduction()) builder.Configuration.AddKeyPerFile("/run/secrets/", false, true);
-if (builder.Environment.IsDevelopment()) builder.Configuration.AddUserSecrets<Program>(true, true);
+if (builder.Environment.IsDevelopment() || builder.Environment.IsEnvironment("CI")) builder.Configuration.AddUserSecrets<Program>(true, true);
 
 
 builder.Services.Configure<ConnectionStringsOptions>(
