@@ -72,7 +72,40 @@ jobs:
         tags: |
           ${{ format('{0}:{1}', env.IMAGE_NAME, steps.meta.outputs.new_tag) }}
           ${{ format('{0}:{1}', env.IMAGE_NAME, env.LATEST_TAG) }}
+          
+  ef_core_migrations:
+    name: Apply EF Core migrations
+    runs-on: ubuntu-latest
+    needs: [build]
+    steps:
+      - uses: actions/checkout@v3
 
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 7.0.x
+          
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --no-restore
+
+      - name: Install dotnet tools
+        run: |
+          dotnet tool install --global dotnet-ef
+          dotnet tool restore
+        
+      - name: Set environment secrets
+        run: |
+          dotnet user-secrets init
+          dotnet user-secrets set "ConnectionStringsOptions:DefaultConnection" ${{ secrets.CONNECTION_STRING }} --project ./Api
+          
+      - name: Update database
+        run: dotnet ef database update --project Infrastructure/Infrastructure.csproj --startup-project Api/Api.csproj --context Infrastructure.Database.ApplicationDbContext
+        env:
+          ASPNETCORE_ENVIRONMENT: Production
+  
   redeploy:
     name: Redeploy webhook call
     runs-on: ubuntu-latest
