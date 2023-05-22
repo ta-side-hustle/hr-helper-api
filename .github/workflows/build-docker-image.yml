@@ -73,32 +73,6 @@ jobs:
             ${{ format('{0}:{1}', env.IMAGE_NAME, steps.meta.outputs.new_tag) }}
             ${{ format('{0}:{1}', env.IMAGE_NAME, env.LATEST_TAG) }}
   
-  ef_core_migrations:
-    name: Apply EF Core migrations
-    runs-on: ubuntu-latest
-    needs: [build]
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: 7.0.x
-
-      - name: Restore dependencies
-        run: dotnet restore
-
-      - name: Install EF tools
-        run: |
-          dotnet new tool-manifest
-          dotnet tool install dotnet-ef
-
-      - name: Generate migration bundle and update database
-        run: |
-          dotnet ef migrations bundle -p Infrastructure/Infrastructure.csproj -s Api/Api.csproj -c Infrastructure.Database.ApplicationDbContext --self-contained -r linux-x64 -o efbundle
-          chmod +x ./efbundle
-          ./efbundle --connection "${{ secrets.CONNECTION_STRING }}"
-  
   redeploy:
     name: Redeploy webhook call
     runs-on: ubuntu-latest
