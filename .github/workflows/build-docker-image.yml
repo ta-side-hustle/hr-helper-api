@@ -98,7 +98,7 @@ jobs:
         
       - name: Set environment secrets
         run: |
-          dotnet user-secrets init
+          dotnet user-secrets init --project ./Api
           dotnet user-secrets set "ConnectionStringsOptions:DefaultConnection" ${{ secrets.CONNECTION_STRING }} --project ./Api
           
       - name: Update database
