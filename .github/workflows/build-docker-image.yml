@@ -94,10 +94,12 @@ jobs:
           dotnet tool install dotnet-ef
 
       - name: Generate migration bundle
-        run: dotnet ef migrations bundle -p Infrastructure/Infrastructure.csproj -s Api/Api.csproj -c Infrastructure.Database.ApplicationDbContext --self-contained -r linux-x64 -o efbundle
+        run: |
+          dotnet ef migrations bundle -p Infrastructure/Infrastructure.csproj -s Api/Api.csproj -c Infrastructure.Database.ApplicationDbContext --self-contained -r linux-x64 -o efbundle
+          chmod +x ./efbundle
 
       - name: Update database
-        run: efbundle
+        run: efbundle --connection "${{ secrets.CONNECTION_STRING }}"
   
   redeploy:
     name: Redeploy webhook call
