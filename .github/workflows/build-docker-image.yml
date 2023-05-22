@@ -96,10 +96,11 @@ jobs:
           dotnet tool install --global dotnet-ef
           dotnet tool restore
         
+      - name: Init environment secrets
+        run: dotnet user-secrets init --project Api
+          
       - name: Set environment secrets
-        run: |
-          dotnet user-secrets init --project ./Api
-          dotnet user-secrets set "ConnectionStringsOptions:DefaultConnection" ${{ secrets.CONNECTION_STRING }} --project ./Api
+        run: dotnet user-secrets set "ConnectionStringsOptions:DefaultConnection" "${{ secrets.CONNECTION_STRING }}" --project Api
           
       - name: Update database
         run: dotnet ef database update --project Infrastructure/Infrastructure.csproj --startup-project Api/Api.csproj --context Infrastructure.Database.ApplicationDbContext
