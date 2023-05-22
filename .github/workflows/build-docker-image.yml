@@ -101,6 +101,9 @@ jobs:
           
       - name: Set environment secrets
         run: dotnet user-secrets set "ConnectionStringsOptions:DefaultConnection" "${{ secrets.CONNECTION_STRING }}" --project Api
+        
+      - name: allow tls v1
+        run: sed -i 's/DEFAULT@SECLEVEL=2/DEFAULT@SECLEVEL=1/g' /etc/ssl/openssl.cnf
           
       - name: Update database
         run: dotnet ef database update --project Infrastructure/Infrastructure.csproj --startup-project Api/Api.csproj --context Infrastructure.Database.ApplicationDbContext
