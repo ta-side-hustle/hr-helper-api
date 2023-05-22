@@ -1,5 +1,4 @@
 #!/bin/bash
-chmod +x ./update-image.sh 
-chmod +x ./apply-migrations.sh 
+git pull
 ./update-image.sh
 ./apply-migrations.sh
