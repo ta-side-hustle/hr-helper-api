@@ -10,72 +10,72 @@ env:
   IMAGE_NAME: tinymosi/hr-helper-api
   TEST_TAG: test
   LATEST_TAG: latest
-  
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v3
-      with:
-        dotnet-version: 7.0.x
-        
-    - name: Restore dependencies
-      run: dotnet restore
-      
-    - name: Build
-      run: dotnet build --no-restore
-      
-    - name: Test
-      run: dotnet test --no-build --verbosity normal
-      
+      - uses: actions/checkout@v3
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 7.0.x
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --no-restore
+
+      - name: Test
+        run: dotnet test --no-build --verbosity normal
+  
   docker:
     name: Build and push Docker image to Docker Hub
     runs-on: ubuntu-latest
     needs: [build]
     steps:
-    - name: Checkout the repo
-      uses: actions/checkout@v3
-      
-    - name: Bump and extract version tag
-      id: meta
-      uses: mathieudutour/github-tag-action@v6.1
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        tag_prefix: ''
-        
-    - name: Set up QEMU
-      uses: docker/setup-qemu-action@v2
-      
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2
-      
-    - name: Log in to Docker hub
-      uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
-      with:
-        username: ${{ secrets.DOCKER_USER }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
-        logout: true
-        
-    - name: Build and push Docker image
-      uses: docker/build-push-action@v4
-      with:
-        context: .
-        file: Api/Dockerfile
-        platforms: |
-          linux/amd64
-          linux/arm/v7
-          linux/arm64/v8
-        push: true
-        tags: |
-          ${{ format('{0}:{1}', env.IMAGE_NAME, steps.meta.outputs.new_tag) }}
-          ${{ format('{0}:{1}', env.IMAGE_NAME, env.LATEST_TAG) }}
-          
+      - name: Checkout the repo
+        uses: actions/checkout@v3
+
+      - name: Bump and extract version tag
+        id: meta
+        uses: mathieudutour/github-tag-action@v6.1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          tag_prefix: ''
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Log in to Docker hub
+        uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
+        with:
+          username: ${{ secrets.DOCKER_USER }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          logout: true
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: Api/Dockerfile
+          platforms: |
+            linux/amd64
+            linux/arm/v7
+            linux/arm64/v8
+          push: true
+          tags: |
+            ${{ format('{0}:{1}', env.IMAGE_NAME, steps.meta.outputs.new_tag) }}
+            ${{ format('{0}:{1}', env.IMAGE_NAME, env.LATEST_TAG) }}
+  
   ef_core_migrations:
     name: Apply EF Core migrations
-    runs-on: ubuntu-16.04
+    runs-on: ubuntu-latest
     needs: [build]
     steps:
       - uses: actions/checkout@v3
@@ -84,28 +84,20 @@ jobs:
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: 7.0.x
-          
+
       - name: Restore dependencies
         run: dotnet restore
 
-      - name: Build
-        run: dotnet build --no-restore
-
-      - name: Install dotnet tools
+      - name: Install EF tools
         run: |
-          dotnet tool install --global dotnet-ef
-          dotnet tool restore
-        
-      - name: Init environment secrets
-        run: dotnet user-secrets init --project Api
-          
-      - name: Set environment secrets
-        run: dotnet user-secrets set "ConnectionStringsOptions:DefaultConnection" "${{ secrets.CONNECTION_STRING }}" --project Api
-        
+          dotnet new tool-manifest
+          dotnet tool install dotnet-ef
+
+      - name: Generate migration bundle
+        run: dotnet ef migrations bundle -p Infrastructure/Infrastructure.csproj -s Api/Api.csproj -c Infrastructure.Database.ApplicationDbContext --self-contained -r linux-x64 -o efbundle
+
       - name: Update database
-        run: dotnet ef database update --project Infrastructure/Infrastructure.csproj --startup-project Api/Api.csproj --context Infrastructure.Database.ApplicationDbContext
-        env:
-          ASPNETCORE_ENVIRONMENT: CI
+        run: efbundle
   
   redeploy:
     name: Redeploy webhook call
