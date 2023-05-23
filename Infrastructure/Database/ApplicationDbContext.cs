@@ -1,4 +1,5 @@
 using Domain.Models.Auth;
+using Domain.Models.Organization;
 using Infrastructure.Options;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -18,6 +19,7 @@ public class ApplicationDbContext : IdentityDbContext
 
 	public new DbSet<UserModel> Users { get; set; }
 	public new DbSet<RoleModel> Roles { get; set; }
+	public DbSet<OrganizationModel> Organizations { get; set; }
 
 	protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 	{
