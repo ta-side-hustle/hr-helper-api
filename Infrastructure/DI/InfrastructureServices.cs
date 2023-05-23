@@ -3,7 +3,6 @@ using Application.User.Interfaces;
 using Domain.Models.Auth;
 using Infrastructure.Auth.Service;
 using Infrastructure.Database;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -30,7 +29,7 @@ namespace Infrastructure.DI
 
 					options.User.RequireUniqueEmail = true;
 				})
-				.AddRoles<IdentityRole>()
+				.AddRoles<RoleModel>()
 				.AddEntityFrameworkStores<ApplicationDbContext>();
 
 			services
