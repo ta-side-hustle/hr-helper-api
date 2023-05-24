@@ -20,6 +20,7 @@ public class ApplicationDbContext : IdentityDbContext
 	public new DbSet<UserModel> Users { get; set; }
 	public new DbSet<RoleModel> Roles { get; set; }
 	public DbSet<OrganizationModel> Organizations { get; set; }
+	public DbSet<UserOrganizationModel> UserOrganizations { get; set; }
 
 	protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 	{

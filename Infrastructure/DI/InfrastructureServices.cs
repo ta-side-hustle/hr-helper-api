@@ -1,8 +1,11 @@
+using System.Reflection;
 using Application.Auth.Interfaces;
+using Application.Organization.Interfaces;
+using Application.Organization.Mapper;
 using Application.User.Interfaces;
 using Domain.Models.Auth;
-using Infrastructure.Auth.Service;
 using Infrastructure.Database;
+using Infrastructure.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -32,9 +35,12 @@ namespace Infrastructure.DI
 				.AddRoles<RoleModel>()
 				.AddEntityFrameworkStores<ApplicationDbContext>();
 
+			services.AddAutoMapper(Assembly.GetAssembly(typeof(OrganizationMappingProfile)));
+
 			services
 				.AddScoped<IAuthService, AuthService>()
 				.AddScoped<IUserService, UserService>()
+				.AddScoped<IUserRoleService, UserRoleService>()
 				;
 
 			return services;
