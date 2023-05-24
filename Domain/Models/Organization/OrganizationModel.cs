@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Domain.Models.Organization;
 
 public class OrganizationModel
@@ -11,4 +13,6 @@ public class OrganizationModel
 	/// Public name of the organization
 	/// </summary>
 	public string Name { get; set; }
+
+	public ICollection<UserOrganizationModel> Users { get; set; }
 }

@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using Domain.Models.Organization;
 using Microsoft.AspNetCore.Identity;
 
 namespace Domain.Models.Auth;
@@ -13,4 +15,6 @@ public class RoleModel : IdentityRole
 	/// Short description of the role
 	/// </summary>
 	public string Description { get; set; }
+	
+	public ICollection<UserOrganizationModel> Organizations { get; set; }
 }
