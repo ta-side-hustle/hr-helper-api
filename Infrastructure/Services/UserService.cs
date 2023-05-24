@@ -6,7 +6,7 @@ using Domain.Models.Auth;
 using Microsoft.AspNetCore.Identity;
 using Throw;
 
-namespace Infrastructure.Auth.Service;
+namespace Infrastructure.Services;
 
 public class UserService : IUserService
 {

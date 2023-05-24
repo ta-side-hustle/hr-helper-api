@@ -13,7 +13,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Throw;
 
-namespace Infrastructure.Auth.Service;
+namespace Infrastructure.Services;
 
 public class AuthService : IAuthService
 {
