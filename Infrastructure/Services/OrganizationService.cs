@@ -29,14 +29,14 @@ public class OrganizationService : IOrganizationService
 		_authorizationGuard = authorizationGuard;
 	}
 
-	public async Task<int> CreateAsync(OrganizationCreateDto dto)
+	public async Task<int> CreateAsync(OrganizationCreateDto dto, string ownerId)
 	{
 		var model = _mapper.Map<OrganizationModel>(dto);
 
 		await _dbContext.Organizations.AddAsync(model);
 		await _dbContext.SaveChangesAsync();
 
-		await _userRoleService.AddToRoleAsync(model.Id, dto.OwnerId, RoleName.Owner);
+		await _userRoleService.AddToRoleAsync(model.Id, ownerId, RoleName.Owner);
 
 		return model.Id;
 	}

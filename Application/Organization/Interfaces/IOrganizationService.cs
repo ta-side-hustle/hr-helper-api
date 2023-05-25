@@ -15,7 +15,7 @@ public interface IOrganizationService
 	///     The <see cref="Task" /> that represents the asynchronous operation, containing an id of the created
 	///     organization.
 	/// </returns>
-	Task<int> CreateAsync(OrganizationCreateDto dto);
+	Task<int> CreateAsync(OrganizationCreateDto dto, string ownerId);
 
 	/// <summary>
 	///     Get data of the organization.
