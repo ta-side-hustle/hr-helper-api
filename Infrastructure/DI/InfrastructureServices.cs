@@ -41,6 +41,7 @@ namespace Infrastructure.DI
 
 			services
 				.AddScoped<IAuthService, AuthService>()
+			.AddScoped<IAuthorizationGuard, AuthorizationGuard>()
 				.AddScoped<IUserService, UserService>()
 				.AddScoped<IUserRoleService, UserRoleService>()
 				;
