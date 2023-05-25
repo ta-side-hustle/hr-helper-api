@@ -35,6 +35,8 @@ namespace Infrastructure.DI
 				.AddRoles<RoleModel>()
 				.AddEntityFrameworkStores<ApplicationDbContext>();
 
+		services.AddAuthorizationPolicies();
+
 			services.AddAutoMapper(Assembly.GetAssembly(typeof(OrganizationMappingProfile)));
 
 			services
