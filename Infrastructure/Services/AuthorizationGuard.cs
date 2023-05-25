@@ -28,7 +28,5 @@ public class AuthorizationGuard : IAuthorizationGuard
 		authorizationResult.Succeeded
 			.Throw(() => new AuthorizationException(authorizationResult.Failure))
 			.IfFalse();
-
-		throw new AuthenticationException();
 	}
 }
