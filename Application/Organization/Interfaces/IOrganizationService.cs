@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Security.Authentication;
 using System.Threading.Tasks;
 using Application.Organization.Dto;
@@ -27,6 +28,16 @@ public interface IOrganizationService
 	/// <exception cref="OrganizationNotFoundException">Specified organization not found.</exception>
 	/// <exception cref="AuthenticationException">User is not authenticated.</exception>
 	Task<OrganizationDto> GetAsync(int organizationId);
+	
+	/// <summary>
+	///     Get list of the organizations that the specified user is a part of.
+	/// </summary>
+	/// <param name="userId">Id of the user.</param>
+	/// <returns>
+	///     The <see cref="Task" /> that represents the asynchronous operation, containing list of organizations.
+	/// </returns>
+	/// <exception cref="OrganizationNotFoundException">Specified user is not part of any organization.</exception>
+	Task<IList<OrganizationDto>> GetAllByUserAsync(string userId);
 
 	/// <summary>
 	///     Update data of the organization.

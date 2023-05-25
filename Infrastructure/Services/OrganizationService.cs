@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Application.Auth.Enums;
@@ -9,6 +10,7 @@ using Domain.Exceptions;
 using Domain.Models.Organization;
 using Infrastructure.Authorization;
 using Infrastructure.Database;
+using Microsoft.EntityFrameworkCore;
 using Throw;
 
 namespace Infrastructure.Services;
@@ -51,6 +53,20 @@ public class OrganizationService : IOrganizationService
 		organization.ThrowIfNull(() => new OrganizationNotFoundException());
 
 		return _mapper.Map<OrganizationDto>(organization);
+	}
+
+	public async Task<IList<OrganizationDto>> GetAllByUserAsync(string userId)
+	{
+		var organizations = _dbContext.Organizations
+			.Include(x => x.Users)
+			.Where(x => x.Users.Any(u => u.UserId == userId))
+			.ToList();
+
+		organizations
+			.ThrowIfNull(() => new OrganizationNotFoundException())
+			.IfEmpty();
+
+		return await Task.FromResult(_mapper.Map<List<OrganizationDto>>(organizations));
 	}
 
 	public async Task<OrganizationDto> UpdateAsync(OrganizationDto dto)
