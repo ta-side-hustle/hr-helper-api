@@ -37,6 +37,14 @@ public class UserRoleService : IUserRoleService
 		return user.Organizations.Any(x => x.OrganizationId == organizationId && x.RoleId == role.Id);
 	}
 
+	public async Task<bool> IsInOrganizationAsync(int organizationId, string userId)
+	{
+		var user = await _userManager.FindByIdAsync(userId);
+		user.ThrowIfNull(() => new UserNotFoundException());
+		
+		return user.Organizations.Any(x => x.OrganizationId == organizationId);
+	}
+
 	public async Task AddToRoleAsync(int organizationId, string userId, RoleName roleName)
 	{
 		var organization = _dbContext.Organizations

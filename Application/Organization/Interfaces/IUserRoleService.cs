@@ -21,6 +21,18 @@ public interface IUserRoleService
 	Task<bool> IsInRoleAsync(int organizationId, string userId, RoleName roleName);
 
 	/// <summary>
+	///     Check if the specified user is in the specified organization.
+	/// </summary>
+	/// <param name="organizationId">Id of organization to check against.</param>
+	/// <param name="userId">Id of the user to check.</param>
+	/// <returns>
+	///     The <see cref="Task" /> that represents the asynchronous operation, containing a flag indicating whether the
+	///     specified <paramref name="userId" /> is a member of the specified organization.
+	/// </returns>
+	/// <exception cref="UserNotFoundException">User is not found.</exception>
+	Task<bool> IsInOrganizationAsync(int organizationId, string userId);
+
+	/// <summary>
 	///     Add the specified <paramref name="userId" /> to the named role.
 	/// </summary>
 	/// <param name="organizationId">Id of the organization in which specified userId will be added to the role.</param>
