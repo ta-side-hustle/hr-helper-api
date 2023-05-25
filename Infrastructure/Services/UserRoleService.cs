@@ -29,7 +29,10 @@ public class UserRoleService : IUserRoleService
 
 	public async Task<bool> IsInRoleAsync(int organizationId, string userId, RoleName roleName)
 	{
-		var user = await _userManager.FindByIdAsync(userId);
+		var user = await _dbContext.Users
+			.Include(x => x.Organizations)
+			.FirstOrDefaultAsync(x => x.Id == userId);
+		
 		user.ThrowIfNull(() => new UserNotFoundException());
 
 		var role = await _roleManager.Find(roleName);
@@ -39,7 +42,10 @@ public class UserRoleService : IUserRoleService
 
 	public async Task<bool> IsInOrganizationAsync(int organizationId, string userId)
 	{
-		var user = await _userManager.FindByIdAsync(userId);
+		var user = await _dbContext.Users
+			.Include(x => x.Organizations)
+			.FirstOrDefaultAsync(x => x.Id == userId);
+		
 		user.ThrowIfNull(() => new UserNotFoundException());
 		
 		return user.Organizations.Any(x => x.OrganizationId == organizationId);
