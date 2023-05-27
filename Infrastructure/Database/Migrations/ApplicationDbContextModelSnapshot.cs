@@ -22,6 +22,44 @@ namespace Infrastructure.Database.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("Domain.Models.Organization.OrganizationModel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Organizations", (string)null);
+                });
+
+            modelBuilder.Entity("Domain.Models.Organization.UserOrganizationModel", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("OrganizationId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("RoleId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("UserId", "OrganizationId", "RoleId");
+
+                    b.HasIndex("OrganizationId");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("UserOrganizations", (string)null);
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
                     b.Property<string>("Id")
@@ -29,6 +67,10 @@ namespace Infrastructure.Database.Migrations
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Discriminator")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
@@ -47,6 +89,10 @@ namespace Infrastructure.Database.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles", (string)null);
+
+                    b.HasDiscriminator<string>("Discriminator").HasValue("IdentityRole");
+
+                    b.UseTphMappingStrategy();
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -228,6 +274,52 @@ namespace Infrastructure.Database.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("Domain.Models.Auth.RoleModel", b =>
+                {
+                    b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityRole");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("LocalizedName")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.HasDiscriminator().HasValue("RoleModel");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "5b8e7d97-2fef-473f-874d-1ae5bc7c3bcf",
+                            ConcurrencyStamp = "cd448e2d-e19e-4e65-bdad-8df8fd135d72",
+                            Name = "owner",
+                            NormalizedName = "OWNER",
+                            Description = "Имеет полный доступ к управлению организацией",
+                            LocalizedName = "Владелец"
+                        },
+                        new
+                        {
+                            Id = "9e412baa-7d46-4fe4-8f3f-6c69c6fd9ce8",
+                            ConcurrencyStamp = "f3f87ce8-1b2e-4300-9c7a-f04d24a99638",
+                            Name = "admin",
+                            NormalizedName = "ADMIN",
+                            Description = "Управление сотрудниками и редактирование данных организации",
+                            LocalizedName = "Администратор"
+                        },
+                        new
+                        {
+                            Id = "bd61de7f-6110-4356-a4d7-bd444936cf9c",
+                            ConcurrencyStamp = "86c7424c-47e4-463a-8cc5-4fbcab3dd130",
+                            Name = "employee",
+                            NormalizedName = "EMPLOYEE",
+                            Description = "Сотрудник HR-отдела",
+                            LocalizedName = "Сотрудник"
+                        });
+                });
+
             modelBuilder.Entity("Domain.Models.Auth.UserModel", b =>
                 {
                     b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityUser");
@@ -243,6 +335,33 @@ namespace Infrastructure.Database.Migrations
                         .HasColumnType("nvarchar(20)");
 
                     b.HasDiscriminator().HasValue("UserModel");
+                });
+
+            modelBuilder.Entity("Domain.Models.Organization.UserOrganizationModel", b =>
+                {
+                    b.HasOne("Domain.Models.Organization.OrganizationModel", "Organization")
+                        .WithMany("Users")
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Models.Auth.RoleModel", "Role")
+                        .WithMany("Organizations")
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Models.Auth.UserModel", "User")
+                        .WithMany("Organizations")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Organization");
+
+                    b.Navigation("Role");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -294,6 +413,21 @@ namespace Infrastructure.Database.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Domain.Models.Organization.OrganizationModel", b =>
+                {
+                    b.Navigation("Users");
+                });
+
+            modelBuilder.Entity("Domain.Models.Auth.RoleModel", b =>
+                {
+                    b.Navigation("Organizations");
+                });
+
+            modelBuilder.Entity("Domain.Models.Auth.UserModel", b =>
+                {
+                    b.Navigation("Organizations");
                 });
 #pragma warning restore 612, 618
         }

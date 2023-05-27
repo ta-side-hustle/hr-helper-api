@@ -13,14 +13,14 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Throw;
 
-namespace Infrastructure.Auth.Service;
+namespace Infrastructure.Services;
 
-public class AuthService : IAuthService
+public class AppAuthenticationService : IAppAuthenticationService
 {
 	private readonly JwtOptions _jwOptions;
 	private readonly UserManager<UserModel> _userManager;
 
-	public AuthService(IOptions<JwtOptions> jwOptions, UserManager<UserModel> userManager)
+	public AppAuthenticationService(IOptions<JwtOptions> jwOptions, UserManager<UserModel> userManager)
 	{
 		_userManager = userManager;
 		_jwOptions = jwOptions.Value;

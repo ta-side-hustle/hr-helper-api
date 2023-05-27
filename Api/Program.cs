@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using Api.Middleware;
+using Api.Providers;
+using Application.Auth.Interfaces;
 using Infrastructure.DI;
 using Infrastructure.Options;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -106,6 +108,8 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 // Service injection
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<IPrincipalProvider, PrincipalProvider>();
 builder.Services.AddInfrastructure(builder.Configuration);
 
 var app = builder.Build();
