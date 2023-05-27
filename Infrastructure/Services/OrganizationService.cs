@@ -17,18 +17,18 @@ namespace Infrastructure.Services;
 
 public class OrganizationService : IOrganizationService
 {
-	private readonly IAuthorizationGuard _authorizationGuard;
+	private readonly IAppAuthorizationService _appAuthorizationService;
 	private readonly ApplicationDbContext _dbContext;
 	private readonly IMapper _mapper;
 	private readonly IUserRoleService _userRoleService;
 
 	public OrganizationService(ApplicationDbContext dbContext, IMapper mapper, IUserRoleService userRoleService,
-		IAuthorizationGuard authorizationGuard)
+		IAppAuthorizationService appAuthorizationService)
 	{
 		_dbContext = dbContext;
 		_mapper = mapper;
 		_userRoleService = userRoleService;
-		_authorizationGuard = authorizationGuard;
+		_appAuthorizationService = appAuthorizationService;
 	}
 
 	public async Task<int> CreateAsync(OrganizationCreateDto dto, string ownerId)
@@ -48,7 +48,7 @@ public class OrganizationService : IOrganizationService
 		var organization = _dbContext.Organizations
 			.FirstOrDefault(x => x.Id == organizationId);
 
-		await _authorizationGuard.AuthorizeAsync(organization, AuthorizationPolicies.UserIsEmployee);
+		await _appAuthorizationService.AuthorizeAsync(organization, AuthorizationPolicies.UserIsEmployee);
 
 		organization.ThrowIfNull(() => new OrganizationNotFoundException());
 
@@ -73,7 +73,7 @@ public class OrganizationService : IOrganizationService
 	{
 		var organization = await _dbContext.Organizations.FindAsync(dto.Id);
 
-		await _authorizationGuard.AuthorizeAsync(organization, AuthorizationPolicies.UserIsOwnerOrAdmin);
+		await _appAuthorizationService.AuthorizeAsync(organization, AuthorizationPolicies.UserIsOwnerOrAdmin);
 
 		organization.ThrowIfNull(() => new OrganizationNotFoundException());
 
@@ -88,7 +88,7 @@ public class OrganizationService : IOrganizationService
 	{
 		var organization = await _dbContext.Organizations.FindAsync(organizationId);
 
-		await _authorizationGuard.AuthorizeAsync(organization, AuthorizationPolicies.UserIsOwner);
+		await _appAuthorizationService.AuthorizeAsync(organization, AuthorizationPolicies.UserIsOwner);
 
 		organization.ThrowIfNull(() => new OrganizationNotFoundException());
 

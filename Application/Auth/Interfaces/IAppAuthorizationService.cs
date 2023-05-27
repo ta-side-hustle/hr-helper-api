@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Application.Auth.Interfaces;
 
-public interface IAuthorizationGuard
+public interface IAppAuthorizationService
 {
 	/// <summary>
 	///		Authorize access to requested resource for <see cref="ClaimsPrincipal"/> of the request.

@@ -9,12 +9,12 @@ using Throw;
 
 namespace Infrastructure.Services;
 
-public class AuthorizationGuard : IAuthorizationGuard
+public class AppAuthorizationService : IAppAuthorizationService
 {
 	private readonly IAuthorizationService _authorizationService;
 	private readonly IPrincipalProvider _principalProvider;
 
-	public AuthorizationGuard(IAuthorizationService authorizationService, IPrincipalProvider principalProvider)
+	public AppAuthorizationService(IAuthorizationService authorizationService, IPrincipalProvider principalProvider)
 	{
 		_authorizationService = authorizationService ?? throw new ArgumentNullException(nameof(authorizationService));
 		_principalProvider = principalProvider ?? throw new ArgumentNullException(nameof(principalProvider));

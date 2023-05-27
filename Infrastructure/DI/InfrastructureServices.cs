@@ -41,8 +41,8 @@ public static class InfrastructureServices
 		services.AddAutoMapper(Assembly.GetAssembly(typeof(OrganizationMappingProfile)));
 
 		services
-			.AddScoped<IAuthService, AuthService>()
-			.AddScoped<IAuthorizationGuard, AuthorizationGuard>()
+			.AddScoped<IAppAuthenticationService, AppAuthenticationService>()
+			.AddScoped<IAppAuthorizationService, AppAuthorizationService>()
 			.AddScoped<IUserService, UserService>()
 			.AddScoped<IUserRoleService, UserRoleService>()
 			.AddScoped<IOrganizationService, OrganizationService>()
