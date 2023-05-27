@@ -1,20 +1,26 @@
 using System.Threading.Tasks;
+using Application.Organization.Interfaces;
 using Application.User.Dto;
 using Application.User.Interfaces;
+using AutoMapper;
 using Domain.Exceptions;
 using Domain.Models.Auth;
 using Microsoft.AspNetCore.Identity;
 using Throw;
 
-namespace Infrastructure.Auth.Service;
+namespace Infrastructure.Services;
 
 public class UserService : IUserService
 {
 	private readonly UserManager<UserModel> _userManager;
+	private readonly IUserRoleService _roleService;
+	private readonly IMapper _mapper;
 
-	public UserService(UserManager<UserModel> userManager)
+	public UserService(UserManager<UserModel> userManager, IUserRoleService roleService, IMapper mapper)
 	{
 		_userManager = userManager;
+		_roleService = roleService;
+		_mapper = mapper;
 	}
 
 	public async Task<string> Create(UserCreateDto dto)
@@ -40,11 +46,14 @@ public class UserService : IUserService
 		var user = await _userManager.FindByIdAsync(id);
 		user.ThrowIfNull(() => new UserNotFoundException());
 
+		var userOrganizations = await _roleService.GetAsync(id);
+		
 		return new UserDto
 		{
 			LastName = user.LastName,
 			FirstName = user.FirstName,
 			Email = user.Email,
+			Organizations = userOrganizations
 		};
 	}
 
@@ -58,19 +67,18 @@ public class UserService : IUserService
 		return result.Succeeded;
 	}
 
-	public async Task<UserDto> Update(string id, UserDto dto)
+	public async Task<UserDto> Update(string id, UserUpdateDto dto)
 	{
 		var user = await _userManager.FindByIdAsync(id);
 		user.ThrowIfNull(() => new UserNotFoundException());
 
-		user.LastName = dto.LastName;
-		user.FirstName = dto.FirstName;
-
+		_mapper.Map(dto, user);
+		
 		var result = await _userManager.UpdateAsync(user);
 
 		result.Throw(() => new IdentityException(result.Errors))
 			.IfFalse(identityResult => identityResult.Succeeded);
 
-		return dto;
+		return await Get(id);
 	}
 }

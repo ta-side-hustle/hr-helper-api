@@ -60,7 +60,7 @@ public class UserController : AppControllerBase
 	[SwaggerResponse((int)HttpStatusCode.OK, type: typeof(SuccessResult<UserDto>))]
 	[SwaggerResponse((int)HttpStatusCode.Unauthorized, type: typeof(ErrorResult))]
 	[SwaggerResponse((int)HttpStatusCode.NotFound, type: typeof(ErrorResult))]
-	public async Task<IActionResult> UpdateUser([FromBody] UserDto dto)
+	public async Task<IActionResult> UpdateUser([FromBody] UserUpdateDto dto)
 	{
 		var result = await _userService.Update(UserId, dto);
 		return new SuccessResult<UserDto>(result).ToResult(HttpStatusCode.OK);

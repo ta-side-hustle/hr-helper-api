@@ -15,11 +15,11 @@ namespace Api.Modules.Auth.Controller;
 /// </summary>
 public class AuthController : AppControllerBase
 {
-	private readonly IAuthService _authService;
+	private readonly IAppAuthenticationService _authenticationService;
 
-	public AuthController(IAuthService authService)
+	public AuthController(IAppAuthenticationService authenticationService)
 	{
-		_authService = authService;
+		_authenticationService = authenticationService;
 	}
 
 	/// <summary>
@@ -33,7 +33,7 @@ public class AuthController : AppControllerBase
 	[SwaggerResponse((int)HttpStatusCode.BadRequest, type: typeof(ErrorResult))]
 	public async Task<IActionResult> Authenticate(CredentialDto dto)
 	{
-		var token = await _authService.Authenticate(dto);
+		var token = await _authenticationService.Authenticate(dto);
 		return new SuccessResult<TokenDto>(token).ToResult(HttpStatusCode.OK);
 	}
 }

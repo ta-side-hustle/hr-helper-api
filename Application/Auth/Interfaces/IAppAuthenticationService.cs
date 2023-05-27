@@ -4,7 +4,7 @@ using Domain.Exceptions;
 
 namespace Application.Auth.Interfaces
 {
-	public interface IAuthService
+	public interface IAppAuthenticationService
 	{
 		/// <summary>
 		/// Authenticates user credential
