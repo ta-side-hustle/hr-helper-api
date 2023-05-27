@@ -7,4 +7,8 @@ public class OrganizationNotFoundException: NullException
 	public OrganizationNotFoundException() : base("Организация не найдена")
 	{
 	}
+	
+	public OrganizationNotFoundException(string message) : base(message)
+	{
+	}
 }

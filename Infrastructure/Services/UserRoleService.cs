@@ -1,7 +1,10 @@
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Application.Auth.Enums;
 using Application.Organization.Interfaces;
+using Application.User.Dto;
+using AutoMapper;
 using Domain.Exceptions;
 using Domain.Models.Auth;
 using Domain.Models.Organization;
@@ -16,15 +19,17 @@ namespace Infrastructure.Services;
 public class UserRoleService : IUserRoleService
 {
 	private readonly ApplicationDbContext _dbContext;
+	private readonly IMapper _mapper;
 	private readonly RoleManager<RoleModel> _roleManager;
 	private readonly UserManager<UserModel> _userManager;
 
 	public UserRoleService(ApplicationDbContext dbContext, RoleManager<RoleModel> roleManager,
-		UserManager<UserModel> userManager)
+		UserManager<UserModel> userManager, IMapper mapper)
 	{
 		_dbContext = dbContext;
 		_roleManager = roleManager;
 		_userManager = userManager;
+		_mapper = mapper;
 	}
 
 	public async Task<bool> IsInRoleAsync(int organizationId, string userId, RoleName roleName)
@@ -32,7 +37,7 @@ public class UserRoleService : IUserRoleService
 		var user = await _dbContext.Users
 			.Include(x => x.Organizations)
 			.FirstOrDefaultAsync(x => x.Id == userId);
-		
+
 		user.ThrowIfNull(() => new UserNotFoundException());
 
 		var role = await _roleManager.Find(roleName);
@@ -45,9 +50,9 @@ public class UserRoleService : IUserRoleService
 		var user = await _dbContext.Users
 			.Include(x => x.Organizations)
 			.FirstOrDefaultAsync(x => x.Id == userId);
-		
+
 		user.ThrowIfNull(() => new UserNotFoundException());
-		
+
 		return user.Organizations.Any(x => x.OrganizationId == organizationId);
 	}
 
@@ -106,5 +111,35 @@ public class UserRoleService : IUserRoleService
 
 		_dbContext.UserOrganizations.Remove(userRoleToDelete);
 		await _dbContext.SaveChangesAsync();
+	}
+
+	public async Task<IList<UserOrganizationDto>> GetAsync(string userId)
+	{
+		var userOrganizations = await _dbContext.UserOrganizations
+			.Include(x => x.Organization)
+			.Include(x => x.Role)
+			.Where(x => x.UserId == userId)
+			.ToListAsync();
+
+		return _mapper.Map<IEnumerable<UserOrganizationDto>>(userOrganizations).ToList();
+	}
+
+	public async Task<UserOrganizationDto> GetAsync(string userId, int organizationId)
+	{
+		var userIsInOrganization = await IsInOrganizationAsync(organizationId, userId);
+
+		userIsInOrganization
+			.Throw(() =>
+				new OrganizationNotFoundException(
+					"Организация не существует или пользователь не является её сотрудником"))
+			.IfFalse();
+
+		var userOrganization = await _dbContext.UserOrganizations
+			.Include(x => x.Organization)
+			.Include(x => x.Role)
+			.Where(x => x.UserId == userId && x.OrganizationId == organizationId)
+			.ToListAsync();
+
+		return _mapper.Map<IEnumerable<UserOrganizationDto>>(userOrganization).First();
 	}
 }

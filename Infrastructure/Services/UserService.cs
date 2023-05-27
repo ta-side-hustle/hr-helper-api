@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using Application.Organization.Interfaces;
 using Application.User.Dto;
 using Application.User.Interfaces;
 using Domain.Exceptions;
@@ -11,10 +12,12 @@ namespace Infrastructure.Services;
 public class UserService : IUserService
 {
 	private readonly UserManager<UserModel> _userManager;
+	private readonly IUserRoleService _roleService;
 
-	public UserService(UserManager<UserModel> userManager)
+	public UserService(UserManager<UserModel> userManager, IUserRoleService roleService)
 	{
 		_userManager = userManager;
+		_roleService = roleService;
 	}
 
 	public async Task<string> Create(UserCreateDto dto)
@@ -40,11 +43,14 @@ public class UserService : IUserService
 		var user = await _userManager.FindByIdAsync(id);
 		user.ThrowIfNull(() => new UserNotFoundException());
 
+		var userOrganizations = await _roleService.GetAsync(id);
+		
 		return new UserDto
 		{
 			LastName = user.LastName,
 			FirstName = user.FirstName,
 			Email = user.Email,
+			Organizations = userOrganizations
 		};
 	}
 
@@ -65,7 +71,7 @@ public class UserService : IUserService
 
 		user.LastName = dto.LastName;
 		user.FirstName = dto.FirstName;
-
+		
 		var result = await _userManager.UpdateAsync(user);
 
 		result.Throw(() => new IdentityException(result.Errors))
