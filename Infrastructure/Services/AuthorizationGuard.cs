@@ -1,3 +1,4 @@
+using System;
 using System.Security.Authentication;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -15,8 +16,8 @@ public class AuthorizationGuard : IAuthorizationGuard
 
 	public AuthorizationGuard(IAuthorizationService authorizationService, IPrincipalProvider principalProvider)
 	{
-		_authorizationService = authorizationService;
-		_principalProvider = principalProvider;
+		_authorizationService = authorizationService ?? throw new ArgumentNullException(nameof(authorizationService));
+		_principalProvider = principalProvider ?? throw new ArgumentNullException(nameof(principalProvider));
 	}
 	
 	public async Task AuthorizeAsync(object resource, string policy)

@@ -1,3 +1,4 @@
+using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Application.Auth.Enums;
@@ -15,7 +16,7 @@ public class
 
 	public UserIsOrganizationOwnerHandler(IUserRoleService userRoleService)
 	{
-		_userRoleService = userRoleService;
+		_userRoleService = userRoleService ?? throw new ArgumentNullException(nameof(userRoleService));
 	}
 
 	protected override async Task HandleRequirementAsync(
@@ -31,9 +32,9 @@ public class
 			return;
 		}
 
-		var userInOrganizationOwner = await _userRoleService.IsInRoleAsync(resource.Id, userId.Value, RoleName.Owner);
+		var userIsOrganizationOwner = await _userRoleService.IsInRoleAsync(resource.Id, userId.Value, RoleName.Owner);
 
-		if (userInOrganizationOwner)
+		if (userIsOrganizationOwner)
 			context.Succeed(requirement);
 		else
 			context.Fail(new AuthorizationFailureReason(this,

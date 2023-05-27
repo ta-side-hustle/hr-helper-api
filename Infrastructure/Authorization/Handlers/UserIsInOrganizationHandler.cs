@@ -1,3 +1,4 @@
+using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Application.Organization.Interfaces;
@@ -13,7 +14,7 @@ public class UserIsInOrganizationHandler : AuthorizationHandler<UserIsInOrganiza
 
 	public UserIsInOrganizationHandler(IUserRoleService userRoleService)
 	{
-		_userRoleService = userRoleService;
+		_userRoleService = userRoleService ?? throw new ArgumentNullException(nameof(userRoleService));
 	}
 
 	protected override async Task HandleRequirementAsync(

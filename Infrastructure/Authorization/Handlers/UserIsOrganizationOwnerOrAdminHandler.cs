@@ -1,3 +1,4 @@
+using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Application.Auth.Enums;
@@ -16,7 +17,7 @@ public class
 
 	public UserIsOrganizationOwnerOrAdminHandler(IUserRoleService userRoleService)
 	{
-		_userRoleService = userRoleService;
+		_userRoleService = userRoleService ?? throw new ArgumentNullException(nameof(userRoleService));
 	}
 
 	protected override async Task HandleRequirementAsync(
