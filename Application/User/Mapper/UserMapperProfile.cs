@@ -8,6 +8,8 @@ public class UserMapperProfile : Profile
 {
 	public UserMapperProfile()
 	{
+		CreateMap<UserUpdateDto, UserModel>(MemberList.Source);
+		
 		CreateMap<RoleModel, UserRoleDto>(MemberList.Destination)
 			.ForMember(dest => dest.LocalizedDescription, opt => opt.MapFrom(src => src.Description))
 			;

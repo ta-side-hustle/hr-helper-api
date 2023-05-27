@@ -29,7 +29,7 @@ public interface IUserService
 	/// <param name="dto">New user data</param>
 	/// <returns>Updated user data</returns>
 	/// <exception cref="UserNotFoundException">User with specified id not found</exception>
-	Task<UserDto> Update(string id, UserDto dto);
+	Task<UserDto> Update(string id, UserUpdateDto dto);
 	
 	/// <summary>
 	/// Delete user
